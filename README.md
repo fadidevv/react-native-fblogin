@@ -1,6 +1,6 @@
 # React Native FB Login
-[![npm version](https://img.shields.io/npm/v/react-native-fblogin.svg?style=flat)](https://www.npmjs.com/package/react-native-fblogin)
-[![npm downloads](https://img.shields.io/npm/dm/react-native-fblogin.svg?style=flat-square)](https://www.npmjs.com/package/react-native-fblogin)
+[![npm version](https://img.shields.io/npm/v/@fadidev/react-native-fblogin.svg?style=flat)](https://www.npmjs.com/package/@fadidev/react-native-fblogin)
+[![npm downloads](https://img.shields.io/npm/dm/@fadidev/react-native-fblogin.svg?style=flat-square)](https://www.npmjs.com/package/@fadidev/react-native-fblogin)
 
 React Native FB Login is fully IOS and Android compatible component without using any Facebook Native/Web SDK, allowing for Facebook Login integration in [React Native](https://facebook.github.io/react-native/) apps. To use this component developers don't need to install any native sdks also don't need to import or link any sdks in IOS and Android from Facebook. This component is fully compatible and tested with all [React Native](https://facebook.github.io/react-native/) versions no more errors like other components and it is very easy to use.
 
