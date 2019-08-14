@@ -6,7 +6,7 @@ import {
   getAccessToken,
   getMyInformations,
   logout
-} from 'react-native-fblogin'
+} from '@fadidev/react-native-fblogin'
 
 export default class App extends Component {
   state = {
