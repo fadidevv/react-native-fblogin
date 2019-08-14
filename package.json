@@ -1,0 +1,37 @@
+
+{
+    "name": "react-native-fblogin",
+    "version": "1.0.0",
+    "description": "A React Native 'Facebook Login' component without wrapping any Facebook Native/Web SDK",
+    "main": "index.js",
+    "directories": {
+      "example": "example"
+    },
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/fadidevv/react-native-fblogin.git"
+    },
+    "keywords": [
+      "fblogin",
+      "fb-sdk",
+      "react-native",
+      "facebook",
+      "login",
+      "sdk",
+      "react",
+      "ios",
+      "android"
+    ],
+    "author": "@FadiDev",
+    "license": "ISC",
+    "bugs": {
+      "url": "https://github.com/fadidevv/react-native-fblogin/issues"
+    },
+    "homepage": "https://github.com/fadidevv/react-native-fblogin#readme",
+    "dependencies": {
+      "axios": "0.19.0"
+    }
+  }
