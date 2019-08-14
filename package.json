@@ -1,7 +1,7 @@
 
 {
     "name": "@fadidev/react-native-fblogin",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "A React Native 'Facebook Login' component without wrapping any Facebook Native/Web SDK",
     "main": "index.js",
     "directories": {
