@@ -22,13 +22,13 @@ You will need to create [Facebook Login App](https://developers.facebook.com/app
 install the `react-native-fblogin` package in your project or clone [Example](https://github.com/fadidevv/react-native-fblogin/tree/master/example) project:
 
 ```bash
-yarn add react-native-fblogin
+yarn add @fadidev/react-native-fblogin
 ```
 
 > Or, if using npm:
 
 ```bash
-npm install react-native-fblogin
+npm install @fadidev/react-native-fblogin
 ```
 
 ## Usage
@@ -47,7 +47,7 @@ This needs to call when `Login` button in your React Native App is clicked
 ```js
 import React, { Component } from 'react'
 import { View, Button } from 'react-native'
-import { loginInWithPermissions } from 'react-native-fblogin'
+import { loginInWithPermissions } from '@fadidev/react-native-fblogin'
 
 export default class App extends Component {
   state = {
@@ -100,7 +100,7 @@ This will give you the `user_token` when user will logged-in, can access in any 
 ```js
 import React, { Component } from 'react'
 import { View, Button } from 'react-native'
-import { getAccessToken } from 'react-native-fblogin'
+import { getAccessToken } from '@fadidev/react-native-fblogin'
 
 export default class App extends Component {
 
@@ -131,7 +131,7 @@ This will give you the `first_name,last_name,id,picture` like details, can acces
 ```js
 import React, { Component } from 'react'
 import { View, Button } from 'react-native'
-import { getMyInformations } from 'react-native-fblogin'
+import { getMyInformations } from '@fadidev/react-native-fblogin'
 
 export default class App extends Component {
 
@@ -163,7 +163,7 @@ This enough for flushing user data in your application, can access in any compon
 ```js
 import React, { Component } from 'react'
 import { View, Button } from 'react-native'
-import { logout } from 'react-native-fblogin'
+import { logout } from '@fadidev/react-native-fblogin'
 
 export default class App extends Component {
 
