@@ -1,15 +1,23 @@
 import React, { Component } from 'react'
 import {
-  WebView,
   Modal,
+  WebView,
   ActivityIndicator,
-  SafeAreaView
+  Dimensions,
+  SafeAreaView,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Text
 } from 'react-native'
 import Axios from 'axios'
 
 var keyParent = 1
 class Facebook extends Component {
   _graphURL = 'https://graph.facebook.com'
+  _errorsMessages = {
+    whenPropsIsInvalid: 'Please provide missing required props correctly'
+  }
 
   state = {
     url: {
@@ -24,30 +32,64 @@ class Facebook extends Component {
     },
     loginData: '',
     visible: true,
-    randomUrl: ''
+    randomUrl: '',
+    ready: false
   }
 
   _onNavigationStateChange = event => {
+    const { onLoginFailure } = this.props
     const { authTokenUrl } = this.state.url
     let getEvent = event
-    if (getEvent.url.includes('code=')) {
-      let decodeURL = getEvent.url
-        .substr(50, 350)
-        .replace('#', '')
-        .replace('code=', '')
-      var urlFinal = authTokenUrl + decodeURL
-      return decodeURL.length >= 344
-        ? this.setState({ randomUrl: urlFinal.toString() })
-        : null
+    if (getEvent.title.includes('Error')) {
+      this._openCloseModal(false, () => {
+        onLoginFailure(this._errorsMessages.whenPropsIsInvalid)
+        throw new Error(this._errorsMessages.whenPropsIsInvalid)
+      })
+    } else {
+      if (Platform.OS === 'ios') {
+        if (
+          getEvent.url.includes('login_success.html?code=') &&
+          getEvent.jsEvaluationValue === '' &&
+          getEvent.loading === false
+        ) {
+          if (getEvent.url.includes('code=')) {
+            let decodeURL = getEvent.url
+              .substr(50, 350)
+              .replace('#', '')
+              .replace('code=', '')
+            const urlFinal = authTokenUrl + decodeURL
+            this.setState({ randomUrl: urlFinal.toString() }, () => {
+              this._openCloseModal(false, () => {
+                this._requester(this.state.randomUrl)
+              })
+            })
+          }
+        }
+      } else {
+        if (
+          getEvent.url.includes('login_success.html?code=') &&
+          getEvent.title !== '' &&
+          getEvent.loading === false
+        ) {
+          if (getEvent.url.includes('code=')) {
+            let decodeURL = getEvent.url
+              .substr(50, 350)
+              .replace('#', '')
+              .replace('code=', '')
+            const urlFinal = authTokenUrl + decodeURL
+            this.setState({ randomUrl: urlFinal.toString() }, () => {
+              this._openCloseModal(false, () => {
+                this._requester(this.state.randomUrl)
+              })
+            })
+          }
+        }
+      }
     }
   }
 
   _onLoad = () => {
-    if (this.state.randomUrl) {
-      this.setState({ visible: false }, () => {
-        this._requester(this.state.randomUrl)
-      })
-    }
+    return 'Nothing to execute'
   }
 
   _Indicator = () => {
@@ -55,15 +97,19 @@ class Facebook extends Component {
       <ActivityIndicator
         color='#3b5998'
         size='large'
-        style={{
-          flex: 1,
-          marginVertical: 30,
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: 80
-        }}
+        style={styles.indicator}
       />
     )
+  }
+
+  _openCloseModal(status, what = null) {
+    return this.setState({ visible: status }, what)
+  }
+
+  _injectJS = () => {
+    return `
+        document.getElementById('m_login_password').addEventListener('click', () =>  window.postMessage(window.scrollTo(0, 100)))
+    `
   }
 
   _commander = readyToInvoke => {
@@ -74,16 +120,29 @@ class Facebook extends Component {
             animationType='slide'
             transparent={false}
             visible={this.state.visible}
-            onRequestClose={() => this.setState({ visible: false })}
+            onRequestClose={() => this._openCloseModal(false)}
           >
             <WebView
+              style={styles.webView}
+              javaScriptEnabled
               startInLoadingState
               source={{ uri: this.state.url.authLoginUrl }}
               onNavigationStateChange={this._onNavigationStateChange}
-              javaScriptEnabled
+              injectedJavaScript={
+                Platform.OS === 'android' ? this._injectJS() : ''
+              }
               renderLoading={this._Indicator}
               onLoad={this._onLoad}
             />
+            <SafeAreaView style={styles.buttonContainer}>
+              <TouchableOpacity onPress={() => this._openCloseModal(false)}>
+                <SafeAreaView style={styles.closeButtonWithWrapper}>
+                  <SafeAreaView style={styles.closeTextWrapper}>
+                    <Text style={styles.closeText}>Cancel</Text>
+                  </SafeAreaView>
+                </SafeAreaView>
+              </TouchableOpacity>
+            </SafeAreaView>
           </Modal>
         </SafeAreaView>
       )
@@ -91,11 +150,18 @@ class Facebook extends Component {
   }
 
   async _requester(url) {
-    const { status, data } = await Axios.get(url)
-    if (status === 200) {
-      this.setState({ loginData: data }, () => {
-        this._setAccessToken()
-        this._setInformations()
+    try {
+      const { status, data } = await Axios.get(url)
+      if (status === 200) {
+        this.setState({ loginData: data }, () => {
+          this._setAccessToken()
+          this._setInformations()
+        })
+      }
+    } catch (error) {
+      const { onLoginFailure } = this.props
+      this._openCloseModal(false, () => {
+        onLoginFailure(error.message)
       })
     }
   }
@@ -107,16 +173,31 @@ class Facebook extends Component {
     endpoint = '/me',
     fields = this.props.getMyInformations[0]
   ) {
-    const { status, data } = await Axios.get(
-      this._graphURL +
-        endpoint +
-        '?fields=' +
-        fields +
-        '&access_token=' +
-        this.state.loginData.access_token
-    )
-    if (status === 200) {
-      global.INFORMATIONS = data
+    try {
+      const { status, data } = await Axios.get(
+        this._graphURL +
+          endpoint +
+          '?fields=' +
+          fields +
+          '&access_token=' +
+          this.state.loginData.access_token
+      )
+      if (status === 200) {
+        this.setState({ ready: true }, () => {
+          global.INFORMATIONS = data
+          this.props.onLoginSuccess({
+            isLoggedIn: this.state.ready,
+            ...getAccessToken(),
+            ...getMyInformations()
+          })
+          global.ready = this.state.ready
+        })
+      }
+    } catch (error) {
+      const { onLoginFailure } = this.props
+      this._openCloseModal(false, () => {
+        onLoginFailure(error.message)
+      })
     }
   }
 
@@ -129,9 +210,21 @@ export const loginInWithPermissions = ({
   redirectUrl = 'https://facebook.com/connect/login_success.html',
   getMyInformationsFields = 'id,first_name,last_name,name,email,picture',
   clientId = '',
-  secretKey = ''
+  secretKey = '',
+  onLoginSuccess = data => console.log(data),
+  onLoginFailure = error => console.log(error)
 }) => {
-  if (clientId && secretKey) {
+  const _CLIENT_VARS = [
+    'REPLACE_WITH_YOUR_APP_ID',
+    'REPLACE_WITH_YOUR_SECRET_KEY'
+  ]
+  if (
+    clientId &&
+    secretKey &&
+    clientId !== _CLIENT_VARS[0] &&
+    secretKey !== _CLIENT_VARS[1]
+  ) {
+    global.ready = false
     ++keyParent
     return (
       <Facebook
@@ -141,10 +234,13 @@ export const loginInWithPermissions = ({
         clientId={clientId}
         secretKey={secretKey}
         key={keyParent}
+        onLoginSuccess={onLoginSuccess}
+        onLoginFailure={onLoginFailure}
       />
     )
   } else {
-    throw new Error('Please provide missing required props')
+    const whenPropsIsMissing = 'Please provide missing required props'
+    throw new Error(whenPropsIsMissing)
   }
 }
 
@@ -158,6 +254,32 @@ export const getMyInformations = () =>
     ? global.INFORMATIONS
     : { message: 'No information found in store yet.', status: false }
 
+export const getUsername = async () => {
+  if (global.ready) {
+    try {
+      const _settingsURL = 'https://mbasic.facebook.com/settings'
+      const { status, data } = await Axios.get(_settingsURL)
+      if (status === 200) {
+        return {
+          username: data
+            .match(/<a[^>]*/g)[2]
+            .split('?')[0]
+            .replace('<a href=', '')
+            .replace('"/', '')
+        };
+      }
+    } catch (error) {
+      return error.message
+    }
+  } else {
+    return {
+      message:
+        'Please login first with this component in your Facebook account',
+      status: false
+    }
+  }
+}
+
 export const logout = () => {
   if (global.GET_ACCESS_TOKEN && global.INFORMATIONS) {
     (global.GET_ACCESS_TOKEN = ''), (global.INFORMATIONS = '')
@@ -166,5 +288,41 @@ export const logout = () => {
     return { message: 'Nothing to logout.', status: false }
   }
 }
+
+const styles = StyleSheet.create({
+  webView: {
+    marginTop: Platform.OS === 'ios' ? 35 : 0
+  },
+  indicator: {
+    flex: 1,
+    marginVertical: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 80
+  },
+  buttonContainer: {
+    marginVertical: 0.1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative'
+  },
+  closeButtonWithWrapper: {
+    backgroundColor: '#4267b2',
+    width: Dimensions.get('screen').width,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#4267b2'
+  },
+  closeTextWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 6
+  },
+  closeText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold'
+  }
+})
 
 export default Facebook
