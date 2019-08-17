@@ -6,7 +6,7 @@ React Native FB Login is fully IOS and Android compatible component without usin
 
 We use direct Facebook Graph API to prevent importing/linking Native SDK steps from Facebook.
 
-> 🚨**Update**: Fresh <b>v1.0.3</b> with many new features is ready, please upgrade now if you haven't via `npm or yarn`
+> 🚨**Update**: Fresh <b>v1.0.4</b> with many new features is ready, please upgrade now if you haven't via `npm or yarn`
 
 ## IOS/Android Preview
 
