@@ -2,9 +2,11 @@
 [![npm version](https://img.shields.io/npm/v/@fadidev/react-native-fblogin.svg?style=flat)](https://www.npmjs.com/package/@fadidev/react-native-fblogin)
 [![npm downloads](https://img.shields.io/npm/dm/@fadidev/react-native-fblogin.svg?style=flat-square)](https://www.npmjs.com/package/@fadidev/react-native-fblogin)
 
-React Native FB Login is fully IOS and Android compatible component without using any Facebook Native/Web SDK, allowing for Facebook Login integration in [React Native](https://facebook.github.io/react-native/) apps. To use this component developers don't need to install any native sdks also don't need to import or link any sdks in IOS and Android from Facebook. This component is fully compatible and tested with all [React Native](https://facebook.github.io/react-native/) versions no more errors like other components and it is very easy to use.
+React Native FB Login is fully IOS and Android compatible component without using any Facebook Native/Web SDK, allowing for Facebook Login integration in [React Native](https://facebook.github.io/react-native/) apps and it also supports responses like `username` which deprecated by Facebook. To use this component developers don't need to install any native sdks also don't need to import or link any sdks in IOS and Android from Facebook. This component is fully compatible and tested with all [React Native](https://facebook.github.io/react-native/) versions no more errors like other components and it is very easy to use.
 
 We use direct Facebook Graph API to prevent importing/linking Native SDK steps from Facebook.
+
+> 🚨**Update**: Fresh <b>v1.0.3</b> with many new features is ready, please upgrade now if you haven't via `npm or yarn`
 
 ## IOS/Android Preview
 
@@ -41,6 +43,8 @@ npm install @fadidev/react-native-fblogin
 | `getMyInformationsFields` | `array` | This prop will hold admin required fb permissions |
 | `clientId` | `string` |  **Required**. This prop will hold Facebook Login App Client/App Id |
 | `secretKey` | `string` | **Required**. This prop will hold Facebook Login App SecretKey |
+| `onLoginSuccess` | `function` | This prop will take callback and return {...data} when login success |
+| `onLoginFailure` | `function` | This prop will take callback and return {...error} when something fails |
 
 This needs to call when `Login` button in your React Native App is clicked
 
@@ -62,6 +66,8 @@ export default class App extends Component {
                   you can skip it or add more, (optional)
      clientId: default is null and its required
      secretKey: default is null and its required
+     onLoginSuccess: default returns console.log({...data}) when login success
+     onLoginFailure: default returns console.log({...error}) when something fails
   */
   
   loginIn = () => {
@@ -72,7 +78,9 @@ export default class App extends Component {
         redirectUrl: 'https://facebook.com/connect/login_success.html',
         getMyInformationsFields: ['id,first_name,last_name,name,email,picture'],
         clientId: 'REPLACE_WITH_YOUR_APP_ID',
-        secretKey: 'REPLACE_WITH_YOUR_SECRET_KEY'
+        secretKey: 'REPLACE_WITH_YOUR_SECRET_KEY',
+        onLoginSuccess: data => console.log(data),
+        onLoginFailure: error => console.log(error)
       })
     }
   }
@@ -91,6 +99,70 @@ export default class App extends Component {
       </View>
     )
   }
+}
+```
+
+## Response:
+
+```javascript
+{
+   access_token: string,
+   email: string,
+   expires_in: integer,
+   first_name: string,
+   id: string,
+   isLoggedIn: boolean,
+   last_name: string,
+   name: string,
+   picture: {
+        data: {
+            height: integer,
+            is_silhouette: boolean,
+            url: string,
+            width: integer
+        }
+   },
+   token_type: string
+}
+```
+
+### ⚡ getUsername()
+This will give you the `username` when user will logged-in and this `deprecated by Facebook long back` but here its available, can access in any component
+
+```js
+import React, { Component } from 'react'
+import { View, Button } from 'react-native'
+import { getUsername } from '@fadidev/react-native-fblogin'
+
+export default class App extends Component {
+
+  render() {
+    return (
+      <View style={{
+        flex: 1, 
+        justifyContent: 'space-evenly', 
+        width: '50%', 
+        alignSelf: 'center', 
+        marginVertical: '10%'}}>
+      <Button
+          onPress={() => {
+            getUsername()
+              .then(username => console.log(username))
+              .catch(error => console.log(error))
+          }}
+          title='getUsername'
+        />
+      </View>
+    )
+  }
+}
+```
+
+## Response:
+
+```javascript
+{ 
+   username: string
 }
 ```
 
@@ -122,7 +194,7 @@ export default class App extends Component {
 ## Response:
 
 ```javascript
-{ 'accessToken': string, 'expiresIn': string, 'status': boolean }
+{ accessToken: string, expiresIn: string, status: boolean }
 ```
 
 ### getMyInformations()
@@ -153,7 +225,15 @@ export default class App extends Component {
 ## Response:
 
 ```javascript 
-{ 'id': double, 'first_name': string, 'last_name': string, 'name': string, 'email': string, 'picture': string }
+{ 
+   id: double, 
+   first_name: string, 
+   last_name: string, 
+   name: string, 
+   email: string, 
+   picture: object, 
+   token_type: string 
+}
 ```
 
 ### logout()
@@ -185,7 +265,7 @@ export default class App extends Component {
 ## Response:
 
 ```javascript
-{ message: 'Successfully logout.', status: true }  OR { message: 'Nothing to logout.', status: false }
+{ message: string, status: boolean }
 ```
 
 ## Contributing
