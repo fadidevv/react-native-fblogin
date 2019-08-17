@@ -5,6 +5,7 @@ import {
   loginInWithPermissions,
   getAccessToken,
   getMyInformations,
+  getUsername,
   logout
 } from '@fadidev/react-native-fblogin'
 
@@ -21,7 +22,9 @@ export default class App extends Component {
         redirectUrl: 'https://facebook.com/connect/login_success.html',
         getMyInformationsFields: ['id,first_name,last_name,name,email,picture'],
         clientId: 'REPLACE_WITH_YOUR_APP_ID',
-        secretKey: 'REPLACE_WITH_YOUR_SECRET_KEY'
+        secretKey: 'REPLACE_WITH_YOUR_SECRET_KEY',
+        onLoginSuccess: data => console.log(data),
+        onLoginFailure: error => console.log(error)
       })
     }
   }
@@ -46,6 +49,14 @@ export default class App extends Component {
         <Button
           onPress={() => alert(JSON.stringify(getMyInformations()))}
           title='getMyInformations'
+        />
+        <Button
+          onPress={() => {
+            getUsername()
+              .then(username => console.log(username))
+              .catch(error => console.log(error))
+          }}
+          title='getUsername'
         />
         <Button
           onPress={() => alert(JSON.stringify(logout()))}
