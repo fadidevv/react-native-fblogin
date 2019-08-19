@@ -6,7 +6,7 @@ React Native FB Login is fully IOS and Android compatible component without usin
 
 We use direct Facebook Graph API to prevent importing/linking Native SDK steps from Facebook.
 
-> 🚨**Update**: Fresh <b>v1.0.4</b> with many new features is ready, please upgrade now if you haven't via `npm or yarn`
+> 🚨**Update**: Fresh <b>v1.0.5</b> with many new features is ready 📹 https://bit.ly/33HxQ2J, please upgrade now if you haven't via `npm or yarn`
 
 ## IOS/Android Preview
 
@@ -15,7 +15,7 @@ We use direct Facebook Graph API to prevent importing/linking Native SDK steps f
 ---
 ## Setup Facebook Login App
 
-You will need to create [Facebook Login App](https://developers.facebook.com/apps/) to use with this component and +add `https://facebook.com/connect/login_success.html` redirect-url in your Facebook Login App Settings in `Valid OAuth Redirect URIs` input field, this link is required in Facebook Login App as it will get use when redirection will occurs when user will logged-in from your application, also you can control this redirect-url from this component as a prop `redirectUrl='YOUR_REDIRECT_URL'` for server-side scriptings like `PHP, JSP, nodeJS` to store user information like `token,first_name,last_name` when user will logged-in but it's optional. If you have created already Facebook Login App then you can skip all steps except adding redirect-url in your Facebook Login App Settings in `Valid OAuth Redirect URIs` input field. When everything is done you just need to grab `clientId` and `secretKey` from your Facebook Login App, this component will need these props later.
+You will need to create [Facebook Login App](https://developers.facebook.com/apps/) to use with this component and +add [Click to see Link](https://facebook.com/connect/login_success.html) in your redirect-url Facebook Login App Settings in `Valid OAuth Redirect URIs` input field, this link is required in Facebook Login App as it will get use when redirection will occurs when user will logged-in from your application, also you can control this redirect-url from this component as a prop `redirectUrl='YOUR_REDIRECT_URL'` for server-side scriptings like `PHP, JSP, nodeJS` to store user information like `token,first_name,last_name` when user will logged-in but it's optional. If you have created already Facebook Login App then you can skip all steps except adding redirect-url in your Facebook Login App Settings in `Valid OAuth Redirect URIs` input field. When everything is done you just need to grab `clientId` and `secretKey` from your Facebook Login App, this component will need these props later.
 
 **Note**: When you create new `Facebook Login App` by default App mode always set to `development` and this component works fine with it, but when you are ready to upload your React Native app to the appstores do not forget to submit your `Facebook Login App` for reviewing to change it's status from `development` to `public` mode.
 
